@@ -1,1 +1,9 @@
-
+UrlClickEvents
+| where Workload == 'Email'
+| join kind=leftouter (EmailEvents | project NetworkMessageId, Subject, SenderFromAddress) on NetworkMessageId
+| join kind=inner EmailUrlInfo on Url
+| where UrlDomain has_any ("ipfs", "dweb") and Url has "baf"
+| where EmailDirection == "Inbound" and DeliveryAction != "Blocked"
+| where ActionType == "ClickAllowed"
+| project SenderFromAddress, RecipientEmailAddress, Subject, Url, 
+ActionType, IsClickedThrough, UrlDomain
