@@ -1,3 +1,6 @@
+//IPFS Phishing Campaign
+//Sources: https://blog.talosintelligence.com/ipfs-abuse/, https://www.trendmicro.com/en_us/research/22/l/web3-ipfs-only-used-for-phishing---so-far.html,
+           https://www.trustwave.com/en-us/resources/blogs/spiderlabs-blog/ipfs-the-new-hotbed-of-phishing/
 UrlClickEvents
 | where Workload == 'Email'
 | join kind=leftouter (EmailEvents | project NetworkMessageId, Subject, SenderFromAddress) on NetworkMessageId
