@@ -1,0 +1,10 @@
+Email Events
+| where Timestamp > ago (30d)
+| where EmailDirection == "Inbound"
+| summarize 
+  TotalCount = countif(parse_json(ConfidenceLevel).Phish == "Normal"),
+  HighPhishCount = countif(parse_son(ConfidenceLevel).Phish == "High"),
+  by bin(Timestamp, 24h)
+ | extend Percentage =(todouble(HighPhishCount) * 100 / todouble(TotalCount)
+ | project-away TotalCount, HighPhishCount
+ | render areachart with (title = "Percentage of High Phish Emails", ymax=100)
