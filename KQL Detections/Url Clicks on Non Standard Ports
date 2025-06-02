@@ -1,0 +1,8 @@
+/UrlClickEvents that redirect to non standard ports (443, 80)
+UrlClickEvents
+| where ActionType == "ClickAllowed"
+| extend Redirects = (array_length(todynamic(UrlChain))) - 1
+| extend ParsedUrl = parse_url(tostring(Url))
+| where ParsedUrl.Port !in ("", "443", "80")
+| where ParsedUrl.Host !endswith "yourorg"
+| join kind=inner EmailEvents on NetworkMessageId

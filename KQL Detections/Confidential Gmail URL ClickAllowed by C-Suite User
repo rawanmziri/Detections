@@ -1,0 +1,9 @@
+/Detects for any c-suite level users clicking a gmail confidential link outside the organization
+UrlClickEvents
+| where Workload == 'Email'
+| where ActionType == 'ClickAllowed'
+| join kind=inner EmailEvents on NetworkMessageId
+| where Url has 'confidential-mail.google'
+| where SenderDomain !in ('yourorg.com', 'exampleorg.com')
+| where IsAccountEnabled == true
+| where JobTitle has_any ("VIP", "VP", "CEO", "CISO", "CFO", "etc")

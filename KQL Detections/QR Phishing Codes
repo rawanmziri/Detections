@@ -1,0 +1,9 @@
+/Detecs any Microsoft QR Phishing Emails
+/Regex pattern from community https://x.com/UK_Daniel_Card/status/1704770610360893472?s=20
+EmailAttachmentInfo
+| where FileName matches regex "^[A-Z0-9]{9,10}\\.[A-Za-z0-9]+$"
+| where FileType has "png"
+| join kind=inner EmailEvents on NetworkMessageId
+| where subject contains "auth"
+| where SenderFromDomain !in ("enteryourorg.com", "exampleorgs.com")
+| where DeliveryLocation != "Quarantine"

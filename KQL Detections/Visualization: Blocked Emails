@@ -1,0 +1,12 @@
+EmailEvents 
+| where Timestamp > ago (30d)
+| where EmailDirection == "Inbound"
+| where isnotempty(ReportId)
+| summarize 
+    TotalCount = count(),
+    BlockedCount=countif(DetectionMethods has "spam" and Connectors has "enteryouremailprotectiongateway")
+    by bin(Timestamp, 24h)
+| extend Percentage=(todouble(BlockedCount) * 100 /todouble(TotalCount))
+| where Perecengage >= "enter your % amount"
+| project-away TotalCount, BlockedCount
+| render areachaty with (title="% Of Emails Blocked", yaxis=linear, xaxis=linear, ymax=100, xmax=100)
