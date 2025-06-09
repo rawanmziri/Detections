@@ -1,0 +1,6 @@
+UrlClickEvents
+| where Workload == "Email"
+| where ActionType == "ClickAllowed" or ActionType == "ClickBlocked"
+| where AccountUpn == "enteruserinquestion"
+| join kind=inner EmailEvents on NetworkMessageId
+| project Timestamp, SenderFromAddress, RecipientEmailAddress, Url, ActionType, IPAddress, Subject
