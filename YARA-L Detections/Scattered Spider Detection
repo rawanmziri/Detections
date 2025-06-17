@@ -1,1 +1,39 @@
-#Draft
+rule Initial_Access_Privileged_Account_Password_Reset_followed_by_MFA_Reset{
+
+meta:
+    author: "Rawan"
+    description: "This rule attempts to catch inital access attempts by TAs like Scattered Spider that socially engineer help desks to resetting privileged users passwords 
+    followed by their MFA in a short window"
+    severity: "High"
+
+events:
+    //This will be a multi-event rule looking at two or same products once a password reset occurs and then a MFA reset in sequence order
+
+    //filter for your IdPs product type and where it logs user passwords being resetting
+    //I am using Okta as an example
+    $e1.metadata.log_type = "OKTA"
+    $e1.metadata.product_event_type = "user.account_reset_password"
+    $e1.security_result.action = "ALLOW"
+    //data table or reference set of static or dynamic privileged accounts
+    $e1.target.user.userid in %Highly_priv_users.users
+
+
+    $e2.metadata.log_type = "AZURE_AD_AUDIT"
+    $e2.metadata.product_event_type = "Update user"
+    //Replace line 24 with whatever application you are using to reset user's MFA as a service
+    $e2.principal.application = "Azure Application Service"
+
+    $targetuser = $e1.target.user.userid
+    $targetuser = $e2.target.user.userid
+
+    $e1.metadata.event_timestamp.seconds < $e2.metadata.event_timestamp.seconds
+
+    match:
+        $targetuser
+    
+    outcome:
+        $risk_score = 75
+
+    condition:
+        $e1 and $e2
+}
